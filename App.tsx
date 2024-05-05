@@ -5,114 +5,42 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React from "react"
+import { SafeAreaView } from "react-native"
+import { Provider } from "react-redux"
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { store } from "@store"
+import ReduxContainer from "@container/ReduxContainer"
+import ReactComponent from "@component/ReactComponent"
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+export default (): React.JSX.Element => {
+	const [count, set_count] = React.useState(0)
+	const [fetched, set_fetched] = React.useState("not fetched")
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+	return (
+		<Provider store={store} >
+			<SafeAreaView>
+				<ReactComponent count={count} fetched={fetched} title="React" onPress={start => {
+					const c = count + 1	// setTimeout will keep the original value
+					set_count(c)
+					set_fetched("fetching")
+					setTimeout(() => {
+						if (c % 2) {
+							set_fetched(`fetch success \n count: ${c} \n start at: ${start.toISOString()} \n latency: ${new Date().getTime() - start.getTime()}`)
+
+						} else {
+							set_fetched(`fetch error \n count: ${c} \n start at: ${start.toISOString()} \n latency: ${new Date().getTime() - start.getTime()}`)
+						}
+					}, 1000)
+				}} />
+				{/*
+					react + redux
+					step by step: https://chentsulin.github.io/redux/
+					react-redux Provider allows containers to retrieve from reducer separately. Otherwise pass props to each component.
+				*/}
+				<ReduxContainer />
+			</SafeAreaView>
+		</Provider>
+
+	)
 }
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
