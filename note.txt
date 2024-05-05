@@ -1,0 +1,1 @@
+npx react-native@0.73.7 init redux --version 0.73.7
